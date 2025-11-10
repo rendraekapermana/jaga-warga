@@ -10,7 +10,7 @@
 
       {{-- Link sekarang menggunakan helper route() untuk navigasi --}}
       <div class="hidden md:flex md:items-center md:space-x-6">
-        <a href="{{ route('report') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-10">Make a Report</a>
+        <a href="{{ route('report.step1.show') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-10">Make a Report</a>
         <a href="{{ route('consultation') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-10">Consultation</a>
         <a href="{{ route('community') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-10">Community</a>
         <a href="{{ route('information') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white hover:bg-opacity-10">Information</a>
@@ -50,7 +50,7 @@
        x-transition:leave-end="transform opacity-0 scale-95">
        
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-      <a href="{{ route('report') }}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10">Make a Report</a>
+      <a href="{{ route('report.step1.show') }}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10">Make a Report</a>
       <a href="{{ route('consultation') }}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10">Consultation</a>
       <a href="{{ route('community') }}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10">Community</a>
       <a href="{{ route('information') }}" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10">Information</a>
