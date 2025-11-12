@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +19,7 @@ Route::get('/community', function () {
     return view('community');
 })->name('community');
 
-Route::get('/information', function () {
-    return view('information');
-})->name('information');
+Route::get('/information', [InformationController::class, 'index'])->name('information');
 
 // --- RUTE LAPORAN BARU (MULTI-STEP) ---
 
@@ -36,9 +36,11 @@ Route::get('/report/success', function () {
 })->name('report.success');
 
 // Halaman dashboard default dari Breeze
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    // Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
+});
 
 // Mengimpor route autentikasi (login, register, dll.) dari Laravel Breeze
 require __DIR__ . '/auth.php';

@@ -16,11 +16,18 @@
         }
     </script>
 </head>
-<body class="bg-gray-800">
+<body class="bg-white">
     <x-navbar />
-    <main class="text-white text-center py-20">
-        <h1 class="text-4xl font-bold">Halaman Informasi</h1>
-        <p class="mt-4">Ini adalah halaman untuk informasi.</p>
+    <main class="container mx-auto text-black py-12 px-4">
+        <h1 class="text-3xl font-agrandir mb-1" style="font-family: 'Agrandir'">Information/Blogspot</h1>
+        <p class="text-lg text-black-300 mb-10 max-w-3xl">
+            A trusted space to learn, share, and stay informed about sexual harassment prevention and response. Here you'll find resources, articles, and guidance to help create a safer community.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            @foreach ($informations as $information) 
+                <x-information-card :information="$information" />
+            @endforeach
+        </div>
     </main>
 </body>
 </html>
