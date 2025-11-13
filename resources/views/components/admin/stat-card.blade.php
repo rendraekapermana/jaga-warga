@@ -1,8 +1,7 @@
-@props(['title', 'value'])
+@props(['title', 'subtitle' => '', 'value' => 0])
 
-<div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-200">
-    <div class="text-center">
-        <div class="text-3xl font-bold text-gray-800 mb-2">{{ $value }}</div>
-        <div class="text-sm text-gray-600">{{ $title }}</div>
-    </div>
+<div class="border border-gray-300 rounded-xl p-6 bg-white flex flex-col justify-center text-center">
+    <div class="text-xl font-bold text-gray-900">{{ $title }}</div>
+    <div class="text-sm text-gray-500 mb-2">{{ $subtitle }}</div>
+    <div class="text-5xl font-extrabold text-gray-800">{{ $value }}</div>
 </div>

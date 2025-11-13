@@ -3,54 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View; 
 
 class AdminController extends Controller
 {
-    public function dashboard(): View 
+    public function dashboard()
     {
-        $activityCount = 5090;
-        $reportCount = 90;
-        $consultationCount = 8;
+        $activityCount = 0;
+        $reportCount = 0;
+        $consultationCount = 0;
+        $reports = [];
+        $consultations = [];
 
-        $reports = [
-            (object)[
-                'id' => '001',
-                'name' => 'Syarif Muhammad',
-                'created_at' => now(),
-                'type' => 'Raped',
-                'status' => 'Solved'
-            ],
-            (object)[
-                'id' => '002',
-                'name' => 'Syarif Muhammad',
-                'created_at' => now(),
-                'type' => 'Raped',
-                'status' => 'Pending'
-            ],
-        ];
-
-        $consultations = [
-            (object)[
-                'id' => '001',
-                'patient_name' => 'Syarif Muhammad',
-                'doctor_name' => 'Rizal Romli, S.Psi...',
-                'status' => 'Solved'
-            ],
-             (object)[
-                'id' => '002',
-                'patient_name' => 'Syarif Muhammad',
-                'doctor_name' => 'Rizal Romli, S.Psi...',
-                'status' => 'Pending'
-            ],
-        ];
-
-        return view('dashboard', [
-            'activityCount'     => $activityCount,
-            'reportCount'       => $reportCount,
-            'consultationCount' => $consultationCount,
-            'reports'           => $reports,
-            'consultations'     => $consultations
-        ]);
+        return view('admin.dashboard', compact(
+            'activityCount',
+            'reportCount',
+            'consultationCount',
+            'reports',
+            'consultations'
+        ));
     }
 }

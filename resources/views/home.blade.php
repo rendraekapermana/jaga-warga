@@ -23,26 +23,11 @@
         }
     </script>
 </head>
-<body class="bg-gray-800">
-
-    {{-- 
-      1. Navbar diletakkan di SINI, langsung di dalam <body>. 
-         Ini memberinya "zona sendiri" dan secara alami akan 
-         mendorong <main> ke bawah. 
-         Karena memiliki class 'sticky', ia akan menempel saat di-scroll.
-    --}}
+<body class="bg-gray-800"> 
     <x-navbar />
-
-    {{-- 
-      2. Konten utama dimulai SETELAH navbar.
-         Ini memastikan konten hero TIDAK TERTUMPUK saat halaman dimuat.
-    --}}
     <main>
         <x-hero />
         <x-what-to-do />
     </main>
-
-
-
 </body>
 </html>
