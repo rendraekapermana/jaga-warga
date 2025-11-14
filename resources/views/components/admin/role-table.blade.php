@@ -1,5 +1,4 @@
-<div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-semibold text-gray-800">Role Management</h2>
+<div class="flex justify-end mb-4">
     <button 
         class="bg-blue-600 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700"
         onclick="openModal('addRoleModal')">
