@@ -4,32 +4,30 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasMany; // <-- TAMBAHKAN INI
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
+        'role', // (Pastikan 'role' ada di sini jika Anda ingin bisa mengisinya)
     ];
-
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -49,8 +47,31 @@ class User extends Authenticatable
         ];
     }
 
-    public function reports(): HasMany
+    // ===============================================
+    // !! TAMBAHKAN TIGA FUNGSI DI BAWAH INI !!
+    // ===============================================
+
+    /**
+     * User ini punya banyak Post.
+     */
+    public function posts(): HasMany
     {
-        return $this->hasMany(Report::class);
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * User ini punya banyak Comment.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * User ini punya banyak Like.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
     }
 }

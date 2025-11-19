@@ -32,7 +32,6 @@ return [
             'throw' => false,
         ],
 
-        // Konfigurasi S3 default (biarkan saja)
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -41,29 +40,39 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => false,
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
 
-        // --- INI DISK SUPABASE KITA YANG DIPERBAIKI ---
+        // DISK KHUSUS POSTINGAN (Bucket: posts)
+'supabase_posts' => [
+    'driver' => 's3',
+    'key' => env('AWS_ACCESS_KEY_ID'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    'region' => env('AWS_DEFAULT_REGION'),
+    'bucket' => env('AWS_BUCKET_POSTS'),
+    'endpoint' => env('AWS_ENDPOINT'),
+    'use_path_style_endpoint' => true,  // <-- WAJIB TRUE
+    'visibility' => 'public',
+    'throw' => false,
+],
+
+
+        // DISK UTAMA SUPABASE (Bucket: reports - Opsi B Anda)
         'supabase' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'), 
+            'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'region' => env('AWS_DEFAULT_REGION'), // BIARKAN INI (untuk menghindari error 'region missing')
-            
-            // --- INI PERBAIKANNYA ---
-            'use_path_style_endpoint' => true, // UBAH MENJADI 'true'
-            // --- AKHIR PERBAIKAN ---
-            
+            'region' => env('AWS_DEFAULT_REGION'),
+            'use_path_style_endpoint' => true, // <-- Penting untuk Supabase
             'visibility' => 'public',
+            'throw' => false,
         ],
-        // --- AKHIR BLOK SUPABASE ---
 
-    ],
+    ], // <--- INI PENUTUP 'disks' YANG BENAR
 
     /*
     |--------------------------------------------------------------------------
@@ -72,7 +81,7 @@ return [
     */
 
     'links' => [
-        // public_path('storage') => storage_path('app/public'),
+        public_path('storage') => storage_path('app/public'),
     ],
 
 ];
