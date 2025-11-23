@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // (Pastikan 'role' ada di sini jika Anda ingin bisa mengisinya)
+        'role', // Pastikan kolom role ada di database
     ];
 
     /**
@@ -48,13 +48,54 @@ class User extends Authenticatable
     }
 
     // ===============================================
-    // !! TAMBAHKAN TIGA FUNGSI DI BAWAH INI !!
+    // !! FUNGSI BARU (Untuk Komunitas) !!
     // ===============================================
 
     /**
      * User ini punya banyak Post.
      */
     public function posts(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    /**
+     * User ini punya banyak Comment.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * User ini punya banyak Like.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    // ===============================================
+    // !! FUNGSI YANG SUDAH ADA (Untuk Chat) !!
+    // ===============================================
+
+    // Relasi pesan yang dikirim
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    // Relasi pesan yang diterima
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    // ===============================================
+    // !! WAJIB ADA (Agar History Laporan Tidak Error) !!
+    // ===============================================
+    
+    public function reports(): HasMany
     {
         return $this->hasMany(Post::class);
     }

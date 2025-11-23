@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminRoleController;
@@ -8,24 +9,9 @@ use App\Http\Controllers\AdminInformationController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CommunityController;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ProfileController; // Pastikan Controller ini di-import
 
-Route::get('/test-upload', function () {
-    return view('test-upload');
-});
-
-Route::post('/test-upload', function () {
-    $file = request()->file('file');
-
-    if (!$file) {
-        return "Tidak ada file.";
-    }
-
-    // upload ke supabase
-    $path = Storage::disk('supabase_posts')->putFile('testing', $file);
-
-    return "Upload berhasil! Path: " . $path;
-});
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,43 +19,64 @@ Route::post('/test-upload', function () {
 */
 
 // =========================================================================
-// 1. ROUTE KHUSUS MEDIA (Solusi untuk Windows/Symlink Error)
+// 1. ROUTE TEST UPLOAD (DEBUG)
 // =========================================================================
-// Route ini membaca file langsung dari folder storage tanpa butuh php artisan storage:link
+Route::get('/test-upload', function () {
+    return view('test-upload');
+});
+
+Route::post('/test-upload', function () {
+    $file = request()->file('file');
+    if (!$file) return "Tidak ada file.";
+    $path = Storage::disk('supabase_posts')->putFile('testing', $file);
+    return "Upload berhasil! Path: " . $path;
+});
+
 // =========================================================================
-// 1. ROUTE KHUSUS MEDIA (MODE DEBUG)
+// 2. ROUTE KHUSUS MEDIA
 // =========================================================================
 Route::get('/media/{path}', function ($path) {
-    // Cegah akses folder lain
-    if (str_contains($path, '..')) {
-        return "Error: Dilarang mengakses folder lain (..)";
-    }
-    
-    // Tentukan lokasi file yang dicari
+    if (str_contains($path, '..')) return "Error: Dilarang mengakses folder lain (..)";
     $filePath = storage_path('app/public/' . $path);
-    
-    // CEK APAKAH FILE ADA?
-    if (!file_exists($filePath)) {
-        // JIKA TIDAK ADA, TAMPILKAN PESAN ERROR INI DI BROWSER
-        return "ERROR: File tidak ditemukan!\n" .
-               "Dicari di: " . $filePath . "\n" .
-               "Path dari URL: " . $path;
-    }
-    
-    // Jika ada, tampilkan gambarnya
+    if (!file_exists($filePath)) return "ERROR: File tidak ditemukan!";
     return response()->file($filePath);
 })->where('path', '.*')->name('media.show');
+
+Route::get('/test-upload', function () {
+    return view('test-upload');
+});
+
 // =============================
-// PUBLIC ROUTES (TIDAK PERLU LOGIN)
+// PUBLIC ROUTES
 // =============================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/information', [InformationController::class, 'index'])->name('information');
 
+    // Route untuk setiap link di navbar
+    Route::get('/consultation', function () {
+        return view('consultation');
+    })->name('consultation');
 
 // =============================
-// AUTHENTICATED ROUTES (HARUS LOGIN)
+// AUTHENTICATED ROUTES
 // =============================
 Route::middleware(['auth'])->group(function () {
+
+    // === PROFILE ROUTES (PERBAIKAN DISINI) ===
+    
+    // 1. Halaman My Profile (Dashboard Profil)
+    // URL: /profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+
+    // 2. Halaman Edit Profile (Settings)
+    // URL: /profile/edit (Kita ubah dari '/profile' agar tidak bentrok)
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile/edit', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/edit', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // 3. Halaman History Laporan
+    Route::get('/profile/history', [ProfileController::class, 'history'])->name('profile.history');
+
 
     // --- GROUP UNTUK ROLE: USER ---
     Route::middleware('checkrole:user')->group(function () {
@@ -82,9 +89,13 @@ Route::middleware(['auth'])->group(function () {
 
     // --- GROUP UNTUK ROLE: USER dan PSYCHOLOGIST ---
     Route::middleware('checkrole:user,psychologist')->group(function () {
-        Route::get('/consultation', fn() => view('consultation'))->name('consultation');
         
-        // --- COMMUNITY ROUTES ---
+        // CONSULTATION & CHAT
+        Route::get('/consultation', [ChatController::class, 'index'])->name('consultation'); 
+        Route::get('/chat/{userId}', [ChatController::class, 'show'])->name('chat.show');
+        Route::post('/chat/{userId}', [ChatController::class, 'store'])->name('chat.store');
+        
+        // COMMUNITY
         Route::get('/community', [CommunityController::class, 'index'])->name('community');
         Route::post('/community/post', [CommunityController::class, 'storePost'])->name('community.post.store');
         Route::post('/community/post/{post}/comment', [CommunityController::class, 'storeComment'])->name('community.comment.store');
@@ -98,34 +109,24 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/psychologist/chat', fn() => view('psychologist.chat'))->name('psychologist.chat');
     });
 
-    // --- GROUP UNTUK ROLE: SUPERADMIN ---
+    // --- GROUP ADMIN ---
     Route::middleware('checkrole:superadmin')->prefix('admin')->name('admin.')->group(function () {
-        
         Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
-
-        // ROLE
+        
         Route::get('/role', [AdminRoleController::class, 'index'])->name('role');
         Route::post('/role', [AdminRoleController::class, 'store'])->name('role.store');
         Route::get('/role/{id}', [AdminRoleController::class, 'show'])->name('role.show');
         Route::put('/role/{id}', [AdminRoleController::class, 'update'])->name('role.update');
         Route::delete('/role/{id}', [AdminRoleController::class, 'destroy'])->name('role.destroy');
-
-        // REPORT
+        
         Route::get('/report', [AdminController::class, 'report'])->name('report');
-
-        // CONSULTATION
         Route::get('/consultation', [AdminController::class, 'consultation'])->name('consultation');
-
-        // INFORMATION
+        
         Route::get('/information', [AdminInformationController::class, 'index'])->name('information');
         Route::post('/information', [AdminInformationController::class, 'store'])->name('information.store');
         Route::put('/information/{information}', [AdminInformationController::class, 'update'])->name('information.update');
         Route::delete('/information/{information}', [AdminInformationController::class, 'destroy'])->name('information.destroy');
-   
     });
-
 });
 
-
-// Auth routes (login, register, logout, dll.) dari Breeze
 require __DIR__ . '/auth.php';
