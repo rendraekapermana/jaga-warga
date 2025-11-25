@@ -27,26 +27,18 @@ class AdminController extends Controller
         return view('admin.dashboard', compact(
             'activityCount',
             'reportCount',
-            'consultationCount',
-            'reports',
+            'consultationCount','reports',
             'consultations'
         ));
     }
 
-    public function consultation()
-    {
-        return view('admin.consultation'); // Asumsi view ini ada
-    }
-
-    // Tambahkan method ini untuk memperbaiki error
     public function report()
     {
-        // Ambil data laporan, misalnya semua laporan terbaru
-        $reports = Report::latest()->get(); 
+        return view('admin.report');
+    }
 
-        // Kembalikan ke view admin report dengan data
-        // Pastikan Anda punya view di resources/views/admin/report.blade.php 
-        // atau sesuaikan dengan struktur folder view Anda
-        return view('admin.report', compact('reports')); 
+    public function consultation()
+    {
+        return view('admin.consultation');
     }
 }
