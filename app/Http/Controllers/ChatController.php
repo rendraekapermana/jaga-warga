@@ -15,30 +15,30 @@ class ChatController extends Controller
     {
         $currentUser = Auth::user();
         
-        if ($currentUser->role === 'psychologist') {
-            // === TAMPILAN UNTUK PSIKOLOG ===
-            // Hanya ambil user yang pernah chat (kirim/terima) dengan psikolog ini
+        if ($currentUser->role === 'Psychologist') { // Ensure 'Psychologist' matches DB case
+            // === PSYCHOLOGIST VIEW ===
+            // Get users who have chatted (sent/received) with this psychologist
             
-            // 1. Cari semua pesan yang melibatkan psikolog ini
+            // 1. Find all messages involving this psychologist
             $messages = Message::where('sender_id', $currentUser->id)
                             ->orWhere('receiver_id', $currentUser->id)
                             ->get();
 
-            // 2. Ambil ID lawan bicaranya (Unik)
+            // 2. Get unique IDs of the other party
             $clientIds = $messages->map(function ($msg) use ($currentUser) {
                 return $msg->sender_id == $currentUser->id ? $msg->receiver_id : $msg->sender_id;
             })->unique();
 
-            // 3. Ambil data User berdasarkan ID tersebut
+            // 3. Get User data based on those IDs
             $users = User::whereIn('id', $clientIds)->get();
             
             $pageTitle = 'Riwayat Chat Pasien';
             $emptyMessage = 'Belum ada pasien yang menghubungi Anda.';
 
         } else {
-            // === TAMPILAN UNTUK USER BIASA ===
-            // Tampilkan semua Psikolog yang tersedia
-            $users = User::where('role', 'psychologist')
+            // === REGULAR USER VIEW ===
+            // Show all available Psychologists
+            $users = User::where('role', 'Psychologist') // Ensure 'Psychologist' matches DB case
                          ->where('id', '!=', $currentUser->id)
                          ->get();
             
@@ -49,12 +49,12 @@ class ChatController extends Controller
         return view('consultation', compact('users', 'pageTitle', 'emptyMessage'));
     }
 
-    // ... (Method show, store, dll biarkan tetap sama seperti file sebelumnya) ...
     public function show($userId)
     {
         $receiver = User::findOrFail($userId);
         $currentUserId = Auth::id();
 
+        // Fetch message history between current user and receiver
         $messages = Message::where(function($query) use ($currentUserId, $userId) {
                 $query->where('sender_id', $currentUserId)
                       ->where('receiver_id', $userId);
@@ -76,14 +76,16 @@ class ChatController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
+        // Create the message
         $message = Message::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $userId,
-            'message' => $request->message,
+            'message' => $request->message, // Ensure column name is 'message' in DB, or change to 'content'
         ]);
 
         $broadcastStatus = 'success';
         try {
+            // Broadcast event if broadcasting is set up
             broadcast(new MessageSent($message))->toOthers();
         } catch (\Throwable $e) {
             Log::error('Broadcast Error: ' . $e->getMessage());
