@@ -9,7 +9,12 @@ use App\Http\Controllers\AdminInformationController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\ChatController; // Pastikan controller ini di-import
 use App\Models\Information;
+use App\Models\Message; // Pastikan model Message di-import
+use App\Models\User;    // Pastikan model User di-import
+use App\Http\Middleware\CheckRole; 
 
 // =============================
 // USER PAGE
@@ -18,7 +23,8 @@ Route::get('/', function () {
     $user = auth()->user();
     if ($user && $user->role === 'SuperAdmin') return redirect()->route('admin.dashboard');
     $informations = Information::latest()->take(5)->get();
-    $users = \App\Models\User::where('role', 'psychologist')
+    // Fix: Ensure role matches DB case (Psychologist)
+    $users = \App\Models\User::where('role', 'Psychologist')
                 ->limit(5)
                 ->get();
 
@@ -55,19 +61,56 @@ Route::delete('/profile/edit', fn(Request $request) =>
 )->name('profile.destroy');
 
 // =============================
-// CONSULTATION & COMMUNITY
+// CONSULTATION
 // =============================
 Route::get('/consultation', function () {
     $user = auth()->user();
     if (!$user || !in_array($user->role, ['User','Psychologist'])) abort(403);
-    return view('consultation');
+    
+    $users = collect(); // Default empty collection
+    $pageTitle = 'Daftar Konsultasi'; // Default title
+
+    if ($user->role === 'Psychologist') {
+        // Jika yang login Psikolog, tampilkan daftar pasien yang pernah chat
+        // Ambil ID user yang pernah mengirim pesan ke psikolog ini ATAU menerima pesan dari psikolog ini
+        $userIds = Message::where('sender_id', $user->id)
+                        ->pluck('receiver_id')
+                        ->merge(
+                            Message::where('receiver_id', $user->id)
+                                ->pluck('sender_id')
+                        )
+                        ->unique(); // Pastikan ID unik
+
+        $users = User::whereIn('id', $userIds)->get();
+        $pageTitle = 'Daftar Pasien';
+    } else {
+        // Jika yang login User biasa, tampilkan daftar Psikolog (seperti sebelumnya)
+        $users = User::where('role', 'Psychologist')->get();
+        $pageTitle = 'Pilih Psikolog';
+    }
+    
+    return view('consultation', compact('users', 'pageTitle'));
 })->name('consultation');
 
-Route::get('/community', function () {
-    $user = auth()->user();
-    if (!$user || !in_array($user->role, ['User','Psychologist'])) abort(403);
-    return view('community');
-})->name('community');
+// =============================
+// COMMUNITY
+// =============================
+// Fixed: Used 'auth' and 'CheckRole' middleware instead of invalid closure
+Route::middleware(['auth', CheckRole::class.':User,Psychologist'])->group(function () {
+    
+    // Main Page
+    Route::get('/community', [CommunityController::class, 'index'])->name('community');
+
+    // Post Actions
+    Route::post('/community/post', [CommunityController::class, 'storePost'])->name('community.post.store');
+    Route::delete('/community/post/{post}', [CommunityController::class, 'destroyPost'])->name('community.post.destroy');
+    Route::put('/community/post/{post}', [CommunityController::class, 'updatePost'])->name('community.post.update');
+    
+    // Interactions
+    Route::post('/community/post/{post}/comment', [CommunityController::class, 'storeComment'])->name('community.comment.store');
+    Route::post('/community/post/{post}/like', [CommunityController::class, 'toggleLike'])->name('community.like');
+});
+
 
 Route::get('/information', [InformationController::class, 'index'])->name('information');
 
@@ -100,13 +143,24 @@ Route::get('/report/success', fn() =>
 )->name('report.success');
 
 // =============================
-// PSYCHOLOGIST PAGE
+// PSYCHOLOGIST PAGE & CHAT
 // =============================
 Route::get('/psychologist/chat', function () {
     $user = auth()->user();
     if (!$user || $user->role !== 'Psychologist') abort(403);
     return view('psychologist.chat');
 })->name('psychologist.chat');
+
+// PERBAIKAN: Menambahkan Route Chat Show DAN Store
+Route::middleware(['auth'])->group(function () {
+    // Route untuk menampilkan halaman chat
+    Route::get('/chat/{userId}', [ChatController::class, 'show'])->name('chat.show');
+    
+    // Route POST untuk mengirim pesan (INI YANG HILANG SEBELUMNYA)
+    // Pastikan URL ini cocok dengan yang ada di JavaScript (Axios) Anda. 
+    // Error log menunjukkan POST http://127.0.0.1:8000/chat/7
+    Route::post('/chat/{userId}', [ChatController::class, 'store'])->name('chat.store');
+});
 
 // =============================
 // ADMIN PAGE (SUPERADMIN ONLY)
