@@ -19,7 +19,7 @@ class Report extends Model
         'user_id',
         'status',
 
-        // Kolom dari Form Langkah 1
+        // Data from Step 1
         'first_name',
         'last_name',
         'place_of_birth',
@@ -28,20 +28,19 @@ class Report extends Model
         'email',
         'phone_number',
 
-        // Kolom dari Form Langkah 2
+        // Data from Step 2
         'incident_type',
         'incident_date',
-        'incident_time',
-        'incident_location',
-        'description',
-        'evidence_file_path',
+        'incident_time',      // Must exist here to be saved
+        'incident_location',  // Must exist here to be saved
+        'description',        // Must exist here to be saved
+        'evidence_file_path', // Must exist here to be saved
         'is_anonymous',
-        
     ];
 
     /**
-     * Relasi ke User model
-     * Sebuah Report dimiliki oleh satu User
+     * Relationship to User model
+     * A Report belongs to one User
      */
     public function user(): BelongsTo
     {

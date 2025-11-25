@@ -21,9 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',          
-        'gender',        
-        'date_of_birth', 
+        'role',
+        'gender',
+        'date_of_birth',
+        'phone_number', // Ensure this is here if you use it
     ];
 
     /**
@@ -50,19 +51,19 @@ class User extends Authenticatable
     }
 
     // =================================================================
-    // RELASI UNTUK FITUR COMMUNITY (JANGAN DIHAPUS)
+    // RELATIONS FOR COMMUNITY FEATURE
     // =================================================================
 
     /**
-     * User ini punya banyak Post.
+     * User has many Posts (Community).
      */
     public function posts(): HasMany
     {
-        return $this->hasMany(Report::class);
+        return $this->hasMany(Post::class); // CORRECTED: Points to Post model
     }
 
     /**
-     * User ini punya banyak Comment.
+     * User has many Comments.
      */
     public function comments(): HasMany
     {
@@ -70,7 +71,7 @@ class User extends Authenticatable
     }
 
     /**
-     * User ini punya banyak Like.
+     * User has many Likes.
      */
     public function likes(): HasMany
     {
@@ -78,27 +79,29 @@ class User extends Authenticatable
     }
 
     // ===============================================
-    // !! FUNGSI YANG SUDAH ADA (Untuk Chat) !!
+    // RELATIONS FOR CHAT
     // ===============================================
 
-    // Relasi pesan yang dikirim
     public function sentMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
-    // Relasi pesan yang diterima
     public function receivedMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
     // ===============================================
-    // !! WAJIB ADA (Agar History Laporan Tidak Error) !!
+    // RELATION FOR REPORTS (CRITICAL FIX)
     // ===============================================
     
+    /**
+     * User has many Reports (History).
+     * This must point to the Report model, NOT Post.
+     */
     public function reports(): HasMany
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Report::class); // CORRECTED: Points to Report model
     }
 }
