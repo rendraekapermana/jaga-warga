@@ -28,10 +28,10 @@
                 <div class="bg-custom-blue rounded-2xl p-6 sm:p-10 mb-10 text-white shadow-lg flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
                     <div class="relative z-10 max-w-2xl">
                         <h3 class="text-2xl sm:text-3xl font-bold mb-3">
-                            {{ Auth::user()->role === 'psychologist' ? 'Halo, Dokter!' : 'Butuh Teman Cerita?' }}
+                            {{ Auth::user()->role === 'Psychologist' ? 'Halo, Dokter!' : 'Butuh Teman Cerita?' }}
                         </h3>
                         <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
-                            {{ Auth::user()->role === 'psychologist' 
+                            {{ Auth::user()->role === 'Psychologist' 
                                 ? 'Pantau riwayat konsultasi pasien Anda di sini.' 
                                 : 'Jaga Warga menyediakan layanan konsultasi aman dan rahasia. Pilih psikolog profesional di bawah ini.' 
                             }}
