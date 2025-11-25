@@ -17,9 +17,18 @@ class AdminController extends Controller
         return view('admin.dashboard', compact(
             'activityCount',
             'reportCount',
-            'consultationCount',
-            'reports',
+            'consultationCount','reports',
             'consultations'
         ));
+    }
+
+    public function report()
+    {
+        return view('admin.report');
+    }
+
+    public function consultation()
+    {
+        return view('admin.consultation');
     }
 }

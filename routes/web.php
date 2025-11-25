@@ -1,194 +1,125 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminRoleController;
 use App\Http\Controllers\AdminInformationController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Information;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// =========================================================================
+// 1. ROUTE KHUSUS MEDIA (Solusi untuk Windows/Symlink Error)
+// =========================================================================
+Route::get('/media/{path}', function ($path) {
+    if (str_contains($path, '..')) abort(403);
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) abort(404);
+    return response()->file($filePath);
+})->where('path', '.*')->name('media.show');
+
 
 // =============================
-// USER PAGE
+// PUBLIC ROUTES (TIDAK PERLU LOGIN)
 // =============================
-Route::get('/', function () {
-    $user = auth()->user();
-    if ($user && $user->role === 'SuperAdmin') return redirect()->route('admin.dashboard');
-    $informations = Information::latest()->take(5)->get();
-    $users = \App\Models\User::where('role', 'psychologist')
-                ->limit(5)
-                ->get();
-
-    return view('home', compact('informations', 'users'));
-})->name('home');
-
-
-// =============================
-// PROFILE (SEMUA USER LOGIN)
-// =============================
-Route::get('/profile', fn() =>
-    (!auth()->user()) ? abort(403)
-    : app(ProfileController::class)->show(request())
-)->name('profile.show');
-
-Route::get('/profile/history', fn() =>
-    (!auth()->user()) ? abort(403)
-    : app(ProfileController::class)->history(request())
-)->name('profile.history');
-
-Route::get('/profile/edit', fn() =>
-    (!auth()->user()) ? abort(403)
-    : app(ProfileController::class)->edit(request())
-)->name('profile.edit');
-
-Route::patch('/profile/edit', fn(Request $request) =>
-    (!auth()->user()) ? abort(403)
-    : app(ProfileController::class)->update($request)
-)->name('profile.update');
-
-Route::delete('/profile/edit', fn(Request $request) =>
-    (!auth()->user()) ? abort(403)
-    : app(ProfileController::class)->destroy($request)
-)->name('profile.destroy');
-
-// =============================
-// CONSULTATION & COMMUNITY
-// =============================
-Route::get('/consultation', function () {
-    $user = auth()->user();
-    if (!$user || !in_array($user->role, ['User','Psychologist'])) abort(403);
-    return view('consultation');
-})->name('consultation');
-
-Route::get('/community', function () {
-    $user = auth()->user();
-    if (!$user || !in_array($user->role, ['User','Psychologist'])) abort(403);
-    return view('community');
-})->name('community');
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/information', [InformationController::class, 'index'])->name('information');
 
-// =============================
-// REPORT MULTISTEP (USER ONLY)
-// =============================
-Route::get('/report/step-1', fn(Request $r) =>
-    (!auth()->user() || auth()->user()->role !== 'User') ? abort(403)
-    : app(ReportController::class)->showStep1($r)
-)->name('report.step1.show');
-
-Route::post('/report/step-1', fn(Request $r) =>
-    (!auth()->user() || auth()->user()->role !== 'User') ? abort(403)
-    : app(ReportController::class)->storeStep1($r)
-)->name('report.step1.store');
-
-Route::get('/report/step-2', fn(Request $r) =>
-    (!auth()->user() || auth()->user()->role !== 'User') ? abort(403)
-    : app(ReportController::class)->showStep2($r)
-)->name('report.step2.show');
-
-Route::post('/report/step-2', fn(Request $r) =>
-    (!auth()->user() || auth()->user()->role !== 'User') ? abort(403)
-    : app(ReportController::class)->storeStep2($r)
-)->name('report.step2.store');
-
-Route::get('/report/success', fn() =>
-    (!auth()->user() || auth()->user()->role !== 'User') ? abort(403)
-    : view('report-success')
-)->name('report.success');
 
 // =============================
-// PSYCHOLOGIST PAGE
+// AUTHENTICATED ROUTES (HARUS LOGIN)
 // =============================
-Route::get('/psychologist/chat', function () {
-    $user = auth()->user();
-    if (!$user || $user->role !== 'Psychologist') abort(403);
-    return view('psychologist.chat');
-})->name('psychologist.chat');
+Route::middleware(['auth'])->group(function () {
 
-// =============================
-// ADMIN PAGE (SUPERADMIN ONLY)
-// =============================
-Route::prefix('admin')->name('admin.')->group(function () {
+    // --- PROFILE ROUTES ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminController::class)->dashboard()
-    )->name('dashboard');
+    // PERBAIKAN ERROR: Menambahkan route 'profile.show' yang dicari oleh Navbar.
+    // Kita arahkan ke 'edit' karena ProfileController bawaan Breeze biasanya tidak punya method 'show'.
+    Route::get('/profile/view', [ProfileController::class, 'edit'])->name('profile.show');
 
-    // ROLE
-    Route::get('/role', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminRoleController::class)->index()
-    )->name('role');
 
-    Route::post('/role', fn(Request $r) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminRoleController::class)->store($r)
-    )->name('role.store');
+    // --- GROUP UNTUK ROLE: USER ---
+    // PERBAIKAN: Ganti 'user' menjadi 'User' (sesuai database)
+    Route::middleware('checkrole:User')->group(function () {
+        Route::get('/report/step-1', [ReportController::class, 'showStep1'])->name('report.step1.show');
+        Route::post('/report/step-1', [ReportController::class, 'storeStep1'])->name('report.step1.store');
+        Route::get('/report/step-2', [ReportController::class, 'showStep2'])->name('report.step2.show');
+        Route::post('/report/step-2', [ReportController::class, 'storeStep2'])->name('report.step2.store');
+        Route::get('/report/success', fn() => view('report-success'))->name('report.success');
+    });
 
-    Route::get('/role/{id}', fn($id) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminRoleController::class)->show($id)
-    )->name('role.show');
 
-    Route::put('/role/{id}', fn(Request $r, $id) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminRoleController::class)->update($r, $id)
-    )->name('role.update');
+    // --- GROUP UNTUK ROLE: USER dan PSYCHOLOGIST ---
+    // PERBAIKAN: Gunakan 'User' dan 'Psychologist' (Huruf depan besar)
+    Route::middleware('checkrole:User,Psychologist')->group(function () {
+        
+        // Route Consultation
+        Route::get('/consultation', function () {
+            $users = \App\Models\User::where('role', 'Psychologist')->get(); // Sesuaikan query juga
+            return view('consultation', compact('users'));
+        })->name('consultation');
 
-    Route::delete('/role/{id}', fn($id) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminRoleController::class)->destroy($id)
-    )->name('role.destroy');
+        // PERBAIKAN ERROR: Menambahkan route 'chat.show'
+        // Ini adalah placeholder sementara agar halaman tidak error. 
+        // Nanti bisa Anda ganti dengan Controller Chat yang sebenarnya.
+        Route::get('/chat/{id}', function ($id) {
+            return "Halaman Chat untuk User ID: " . $id; 
+        })->name('chat.show');
+        
+        // --- COMMUNITY ROUTES ---
+        Route::get('/community', [CommunityController::class, 'index'])->name('community');
+        Route::post('/community/post', [CommunityController::class, 'storePost'])->name('community.post.store');
+        Route::post('/community/post/{post}/comment', [CommunityController::class, 'storeComment'])->name('community.comment.store');
+        Route::post('/community/post/{post}/like', [CommunityController::class, 'toggleLike'])->name('community.like');
+        Route::delete('/community/post/{post}', [CommunityController::class, 'destroyPost'])->name('community.post.destroy');
+        Route::put('/community/post/{post}', [CommunityController::class, 'updatePost'])->name('community.post.update');
+    });
 
-    // REPORT
-    Route::get('/report', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminController::class)->report()
-    )->name('report');
 
-    // CONSULTATION
-    Route::get('/consultation', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminController::class)->consultation()
-    )->name('consultation');
+    // --- GROUP UNTUK ROLE: PSYCHOLOGIST ---
+    // PERBAIKAN: Gunakan 'Psychologist'
+    Route::middleware('checkrole:Psychologist')->group(function () {
+        Route::get('/psychologist/chat', fn() => view('psychologist.chat'))->name('psychologist.chat');
+    });
 
-    // INFORMATION
-    Route::get('/information', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminInformationController::class)->index()
-    )->name('information');
 
-    Route::post('/information', fn(Request $r) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminInformationController::class)->store($r)
-    )->name('information.store');
+    // --- GROUP UNTUK ROLE: SUPERADMIN ---
+    // PERBAIKAN: Gunakan 'SuperAdmin'
+    Route::middleware('checkrole:SuperAdmin')->prefix('admin')->name('admin.')->group(function () {
+        
+        Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::put('/information/{information}', fn(Request $r, Information $information) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminInformationController::class)->update($r, $information)
-    )->name('information.update');
+        // ROLE
+        Route::get('/role', [AdminRoleController::class, 'index'])->name('role');
+        Route::post('/role', [AdminRoleController::class, 'store'])->name('role.store');
+        Route::get('/role/{id}', [AdminRoleController::class, 'show'])->name('role.show');
+        Route::put('/role/{id}', [AdminRoleController::class, 'update'])->name('role.update');
+        Route::delete('/role/{id}', [AdminRoleController::class, 'destroy'])->name('role.destroy');
 
-    Route::delete('/information/{information}', fn(Information $information) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : app(AdminInformationController::class)->destroy($information)
-    )->name('information.destroy');
+        // REPORT
+        Route::get('/report', [AdminController::class, 'report'])->name('report');
 
-    // =============================
-    // OPTIONAL: UPLOAD FILE EXAMPLE
-    // =============================
-    Route::get('/upload', fn() =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : view('admin.upload')
-    )->name('upload.show');
+        // CONSULTATION
+        Route::get('/consultation', [AdminController::class, 'consultation'])->name('consultation');
 
-    Route::post('/upload', fn(Request $r) =>
-        (!auth()->user() || auth()->user()->role !== 'SuperAdmin') ? abort(403)
-        : Storage::disk('supabase')->putFile('uploads', $r->file('file'))
-    )->name('upload.store');
+        // INFORMATION
+        Route::get('/information', [AdminInformationController::class, 'index'])->name('information');
+        Route::post('/information', [AdminInformationController::class, 'store'])->name('information.store');
+        Route::put('/information/{information}', [AdminInformationController::class, 'update'])->name('information.update');
+        Route::delete('/information/{information}', [AdminInformationController::class, 'destroy'])->name('information.destroy');
+    });
+
 });
 
 require __DIR__ . '/auth.php';

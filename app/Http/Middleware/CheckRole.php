@@ -16,21 +16,28 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Cek dulu apakah user sudah login (seharusnya sudah, tapi untuk jaga-jaga)
+        // 1. Cek apakah user sudah login
         if (! $request->user()) {
             return redirect()->route('login');
         }
 
-        // Ambil role user yang sedang login
         $userRole = $request->user()->role;
 
-        // Cek apakah role user ada di dalam daftar $roles yang diizinkan
-        if (in_array($userRole, $roles)) {
-            // Jika diizinkan, lanjutkan request
+        // ===============================================================
+        // KARTU SAKTI SUPERADMIN
+        // ===============================================================
+        // Jika role user adalah 'SuperAdmin', izinkan akses ke SEMUA halaman.
+        // Tidak peduli apakah halaman itu khusus 'User' atau 'Psychologist'.
+        if ($userRole === 'SuperAdmin') {
             return $next($request);
         }
 
-        // Jika tidak diizinkan, tampilkan halaman 403 Forbidden
+        // 2. Pengecekan Role Biasa (Untuk user selain SuperAdmin)
+        if (in_array($userRole, $roles)) {
+            return $next($request);
+        }
+
+        // 3. Jika tidak lolos semua cek di atas -> Forbidden
         return abort(403, 'THIS ACTION IS UNAUTHORIZED.');
     }
 }
