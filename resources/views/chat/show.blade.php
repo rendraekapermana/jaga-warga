@@ -190,7 +190,15 @@
                     const messageToSend = this.newMessage; 
                     this.newMessage = ''; 
 
-                    // FIX: Gunakan window.axios secara eksplisit
+                    // FIX: Gunakan window.axios secara eksplisit (didapat dari CDN)
+                    // Jika axios belum tersedia, fallback ke fetch bisa jadi opsi tapi CDN harusnya cukup
+                    if (typeof window.axios === 'undefined') {
+                        console.error('Axios belum dimuat!');
+                        alert('Error sistem: Library gagal dimuat.');
+                        this.isSending = false;
+                        return;
+                    }
+
                     window.axios.post('/chat/' + this.receiverId, { message: messageToSend })
                     .then(response => {
                         const data = response.data.message;
