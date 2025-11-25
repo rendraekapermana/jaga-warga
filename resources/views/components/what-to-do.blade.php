@@ -3,22 +3,22 @@
         [
             'title' => 'Stay Safe',
             'color' => 'bg-red-200',
-            'image' => '/image/stay-safe.png',
+            'image' => 'https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/stay-safe.png',
         ],
         [
             'title' => 'Preserve Evidence',
             'color' => 'bg-yellow-200',
-            'image' => '/image/perserve-evidence.png',
+            'image' => 'https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/perserve-evidence.png',
         ],
         [
             'title' => 'Write It Down',
             'color' => 'bg-green-200',
-            'image' => '/image/write-it-down.png',
+            'image' => 'https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/write-it-down.png',
         ],
         [
             'title' => 'Report to <a href="#" class="text-custom-blue font-bold">Jaga Warga</a>',
             'color' => 'bg-blue-200',
-            'image' => '/image/report.png',
+            'image' => 'https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/report.png',
         ],
     ];
 @endphp

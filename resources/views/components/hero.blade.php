@@ -11,7 +11,7 @@
             </a>
         </div>
         <div class="absolute bottom-8 left-4 sm:left-6 lg:left-8">
-            <img src="{{ asset('image/logo.png') }}" alt="Jaga Warga Logo" class="h-10 md:h-12 w-auto">
+            <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/logo.png" alt="Jaga Warga Logo" class="h-10 md:h-12 w-auto">
         </div>
     </div>
 </section>

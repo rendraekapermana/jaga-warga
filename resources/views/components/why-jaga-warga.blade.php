@@ -25,7 +25,7 @@
         <div class="md:w-1/3 flex justify-center">
             
             <div class="bg-white rounded-3xl shadow-lg p-8 flex items-center justify-center">
-                <img src="/image/jw-logo.png" alt="Jaga Warga Logo" class="w-full">
+                <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/jw-logo.png" alt="Jaga Warga Logo" class="w-full">
             </div>
             
         </div>

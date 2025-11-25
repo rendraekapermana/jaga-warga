@@ -4,7 +4,7 @@
 
       <!-- Logo -->
       <a href="{{ route('home') }}" class="flex-shrink-0">
-        <img class="h-8 w-auto" src="{{ asset('image/icon.png') }}" alt="Logo">
+        <img class="h-8 w-auto" src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/icon.png" alt="Logo">
       </a>
 
       <!-- Desktop Menu -->
@@ -16,6 +16,15 @@
           'community' => 'Community',
           'information' => 'Information'
         ] as $route => $label)
+          @php
+            // Cek apakah user login dan rolenya Psychologist
+            $isPsychologist = Auth::check() && Auth::user()->role === 'Psychologist';
+            
+            // Jika route adalah 'Make a Report' DAN user adalah Psychologist, skip (jangan tampilkan)
+            if ($route === 'report.step1.show' && $isPsychologist) {
+                continue;
+            }
+          @endphp
           <a href="{{ route($route) }}" class="px-3 py-2 rounded-md text-md hover:bg-white hover:bg-opacity-10">{{ $label }}</a>
         @endforeach
       </div>
@@ -71,6 +80,13 @@
         'community' => 'Community',
         'information' => 'Information'
       ] as $route => $label)
+        @php
+            // Logika yang sama untuk Mobile Menu
+            $isPsychologist = Auth::check() && Auth::user()->role === 'Psychologist';
+            if ($route === 'report.step1.show' && $isPsychologist) {
+                continue;
+            }
+        @endphp
         <a href="{{ route($route) }}" class="block px-3 py-2 rounded-md text-base hover:bg-white hover:bg-opacity-10">{{ $label }}</a>
       @endforeach
     </div>

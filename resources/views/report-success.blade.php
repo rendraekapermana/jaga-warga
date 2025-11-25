@@ -59,21 +59,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
 
                         <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-                            <img src="{{ asset('image/callcenter-icon.png') }}" alt="Firefighter Icon" class="h-24 w-24 mx-auto">
+                            <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/callcenter-icon.png" alt="Firefighter Icon" class="h-24 w-24 mx-auto">
                             <h3 class="text-2xl font-semibold text-gray-900 mt-4">Call Center</h3>
                             <p class="text-gray-600 mt-2">For any problem</p>
                             <p class="text-3xl font-bold text-custom-blue mt-4">112</p>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-                            <img src="{{ asset('image/medic-icon.png') }}" alt="Ambulance Icon" class="h-24 w-24 mx-auto">
+                            <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/medic-icon.png" alt="Ambulance Icon" class="h-24 w-24 mx-auto">
                             <h3 class="text-2xl font-semibold text-gray-900 mt-4">Ambulance</h3>
                             <p class="text-gray-600 mt-2">For medical emergencies</p>
                             <p class="text-3xl font-bold text-custom-blue mt-4">119</p>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6 text-center">
-                            <img src="{{ asset('image/police-icon.png') }}" alt="Police Icon" class="h-24 w-24 mx-auto">
+                            <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/police-icon.png" alt="Police Icon" class="h-24 w-24 mx-auto">
                             <h3 class="text-2xl font-semibold text-gray-900 mt-4">Police</h3>
                             <p class="text-gray-600 mt-2">For criminal incidents</l>
                             <p class="text-3xl font-bold text-custom-blue mt-4">110</p>

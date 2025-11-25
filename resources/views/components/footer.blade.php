@@ -5,7 +5,7 @@
         <div class="space-y-4">
             <a href="{{ route('home') }}">
                 <!-- Menggunakan asset() agar path gambar tidak error di halaman chat -->
-                <img src="{{ asset('image/logo.png') }}" alt="Jaga Warga Logo" class="w-40">
+                <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/logo.png" alt="Jaga Warga Logo" class="w-40">
             </a>
 
             <p class="text-sm leading-relaxed text-blue-100">
@@ -20,16 +20,16 @@
             {{-- Social Media Icons --}}
             <div class="flex space-x-3 pt-2">
                 <a href="#" class="w-9 h-9 border border-blue-400/50 rounded-lg flex items-center justify-center hover:bg-white hover:text-[#1524A7] transition-all duration-300">
-                    <img src="{{ asset('image/sm2.png') }}" alt="Facebook" class="w-5 h-5">
+                    <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/sm2.png" alt="Facebook" class="w-5 h-5">
                 </a>
                 <a href="#" class="w-9 h-9 border border-blue-400/50 rounded-lg flex items-center justify-center hover:bg-white hover:text-[#1524A7] transition-all duration-300">
-                    <img src="{{ asset('image/sm1.png') }}" alt="Instagram" class="w-6 h-6">
+                    <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/sm1.png" alt="Instagram" class="w-6 h-6">
                 </a>
                 <a href="#" class="w-9 h-9 border border-blue-400/50 rounded-lg flex items-center justify-center hover:bg-white hover:text-[#1524A7] transition-all duration-300">
-                    <img src="{{ asset('image/sm3.png') }}" alt="YouTube" class="w-6 h-6">
+                    <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/sm3.png" alt="YouTube" class="w-6 h-6">
                 </a>
                 <a href="#" class="w-9 h-9 border border-blue-400/50 rounded-lg flex items-center justify-center hover:bg-white hover:text-[#1524A7] transition-all duration-300">
-                    <img src="{{ asset('image/sm4.png') }}" alt="X" class="w-5 h-5">
+                    <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/sm4.png" alt="X" class="w-5 h-5">
                 </a>
             </div>
         </div>
