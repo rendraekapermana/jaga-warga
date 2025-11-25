@@ -6,7 +6,7 @@
             {{-- HEADER --}}
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-4">
-                    <img src="{{ asset('image/logo-biru.png') }}" alt="Logo" class="h-12 w-auto">
+                    <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/logo-biru.png" alt="Logo" class="h-12 w-auto">
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Sign up for JAGA WARGA</h2>
             </div>

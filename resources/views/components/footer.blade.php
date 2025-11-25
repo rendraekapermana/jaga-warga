@@ -4,7 +4,6 @@
         {{-- Kolom 1: Info & Kontak --}}
         <div class="space-y-4">
             <a href="{{ route('home') }}">
-                <!-- Menggunakan asset() agar path gambar tidak error di halaman chat -->
                 <img src="https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/logo.png" alt="Jaga Warga Logo" class="w-40">
             </a>
 

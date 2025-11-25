@@ -1,4 +1,4 @@
-<section class="relative h-[940px] w-full bg-cover bg-center" style="background-image: url('{{ asset('image/hero.png') }}')">
+<section class="relative h-[940px] w-full bg-cover bg-center" style="background-image: url('https://muabtceunyjvfxfkclzs.supabase.co/storage/v1/object/public/images/hero.png')">
     <div class="absolute inset-0 bg-black bg-opacity-60"></div>
     <div class="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="font-family: 'Agrandir'">
         <div class="flex h-full flex-col justify-center items-center text-center text-white">
