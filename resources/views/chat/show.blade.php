@@ -11,10 +11,12 @@
     <title>Ruang Konsultasi - Jaga Warga</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- ADD AXIOS CDN HERE -->
+    <!-- 1. ADD AXIOS CDN (WAJIB UNTUK FIX DEPLOYMENT) -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <!-- 2. Alpine.js -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -188,7 +190,8 @@
                     const messageToSend = this.newMessage; 
                     this.newMessage = ''; 
 
-                    axios.post('/chat/' + this.receiverId, { message: messageToSend })
+                    // FIX: Gunakan window.axios secara eksplisit
+                    window.axios.post('/chat/' + this.receiverId, { message: messageToSend })
                     .then(response => {
                         const data = response.data.message;
                         this.messages.push({
@@ -202,6 +205,7 @@
                     .catch(error => {
                         console.error(error);
                         this.newMessage = messageToSend;
+                        alert('Gagal mengirim pesan. Cek koneksi internet Anda.');
                     })
                     .finally(() => {
                         this.isSending = false;
