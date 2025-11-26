@@ -10,35 +10,41 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        // Hitung jumlah aktivitas (misalnya total report + total konsultasi, atau sesuai logika Anda)
-        // Di sini saya asumsikan aktivitas = total report + total konsultasi
-        $reportCount = Report::count();
-        $consultationCount = User::where('role', 'Psychologist')->count(); // Atau hitung sesi konsultasi jika ada tabelnya
-        $activityCount = $reportCount + $consultationCount;
-
-        // Ambil data terbaru untuk tabel di dashboard
-        $reports = Report::latest()->take(5)->get();
+        // PERBAIKAN: Memastikan SEMUA variabel count dihitung dan didefinisikan
         
-        // Untuk consultations, karena belum ada tabel khusus 'consultations', 
-        // mungkin bisa ambil data chat terakhir atau user psikolog.
-        // Contoh sementara: ambil 5 user psikolog terbaru
+        $reportCount = Report::count();
+        // Asumsi 'Psychologist' adalah role untuk konsultasi
+        $consultationCount = User::where('role', 'Psychologist')->count(); 
+        
+        // Menghitung total aktivitas
+        $activityCount = $reportCount + $consultationCount; // Variabel yang dibutuhkan dashboard
+
+        // Ambil data terbaru untuk tabel ringkasan
+        $reports = Report::latest()->take(5)->get();
         $consultations = User::where('role', 'Psychologist')->latest()->take(5)->get();
 
         return view('admin.dashboard', compact(
-            'activityCount',
+            'activityCount', // Variabel dikirim
             'reportCount',
-            'consultationCount','reports',
+            'consultationCount',
+            'reports',
             'consultations'
         ));
     }
 
+    // Method yang dipanggil oleh /admin/report
     public function report()
     {
-        return view('admin.report');
+        // Menggunakan paginate() untuk halaman penuh
+        $reports = Report::latest()->paginate(20); 
+        return view('admin.report', compact('reports')); 
     }
 
+    // Method yang dipanggil oleh /admin/consultation
     public function consultation()
     {
-        return view('admin.consultation');
+        // Mengambil semua user Psychologist
+        $consultations = \App\Models\User::where('role', 'Psychologist')->get();
+        return view('admin.consultation', compact('consultations'));
     }
 }

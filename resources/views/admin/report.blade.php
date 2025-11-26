@@ -63,7 +63,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button @click="showModal = true; selectedReport = {{ $report }}" 
-                                                    class="text-indigo-600 hover:text-indigo-900 font-semibold">
+                                                     class="text-indigo-600 hover:text-indigo-900 font-semibold">
                                                 Lihat Detail
                                             </button>
                                         </td>
@@ -79,9 +79,14 @@
                         </table>
                     </div>
 
-                    {{-- Pagination Links --}}
+                    {{-- PERBAIKAN: Hanya tampilkan links() jika $reports adalah objek Paginator --}}
                     <div class="mt-4">
-                        {{ $reports->links() }}
+                        @if ($reports instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                            {{ $reports->links() }}
+                        @else
+                            {{-- Optional: Tampilkan pesan jika ini adalah Collection biasa (misal, jika ini dashboard ringkasan) --}}
+                            {{-- <p class="text-xs text-gray-500">Tampilkan hanya data terbaru.</p> --}}
+                        @endif
                     </div>
 
                 </div>
@@ -150,15 +155,10 @@
                                     <div x-show="selectedReport?.evidence_file_path">
                                         <p class="font-bold text-gray-800 mb-2">Bukti Lampiran:</p>
                                         
-                                        {{-- 
-                                            Trik untuk menampilkan link file Supabase:
-                                            Kita akan construct URL secara manual menggunakan data dari .env yang dikirim via PHP,
-                                            atau menggunakan helper JS sederhana. 
-                                            Di sini saya gunakan link langsung sederhana.
-                                        --}}
+                                        {{-- Constructing URL safely (assuming Storage::disk('supabase')->url('') returns the base URL) --}}
                                         <a :href="`{{ Storage::disk('supabase')->url('') }}${selectedReport?.evidence_file_path}`" 
-                                           target="_blank"
-                                           class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+                                            target="_blank"
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
                                             Lihat Bukti (Foto/Video/PDF)
                                         </a>
                                     </div>
